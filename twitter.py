@@ -19,13 +19,28 @@ class Twitter:
             )
         return auth
 
-    def get_comment(self):
-        req = requests.get(self.URL, auth=self.auth, params={"q": "#hogepoyo", "count": "10"})
+    def get_comment(self, hash_tag):
+        req = requests.get(self.URL, auth=self.auth, params={"q": hash_tag, "count": "100"})
         for i in req.iter_lines():
             data = json.loads(i)
-            print(data)
+            json_data = self.create_json(data, len(data["statuses"]))
+            with open("comment.json", "w") as f:
+                json.dump(json_data, f)
+
+    def create_json(self, data, length):
+        res = {"comment": [{} for i in range(length)]}
+        for i in range(length):
+            text = data["statuses"][i]["text"].split()[1]  # tweetの本文
+            date = data["statuses"][i]["created_at"]  # 日付
+            pic = "hoge"  # 画像の
+#            print(data["statuses"][j]["entities"])  # ここからpicのurlを
+
+            res["comment"][i]["text"] = text
+            res["comment"][i]["date"] = date
+            res["comment"][i]["pic"] = pic
+        return res
 
 
 if __name__ == "__main__":
     tw = Twitter()
-    tw.get_comment()
+    tw.get_comment("#hogepoyo")
