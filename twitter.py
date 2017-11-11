@@ -49,13 +49,19 @@ class Twitter:
     def _text_format(self, text, pic=True):
         if pic:
             text = text.split()[:-1]  # 画像のlinkを消す
-            text.remove("#"+self.hash_tag)
+            if text[0] == "#"+self.hash_tag:
+                text.pop(0)
+            elif text[-1] == "#"+self.hash_tag:
+                text.pop(len(text)-1)
         else:
             text = text.split()
-            text.remove("#"+self.hash_tag)
+            if text[0] == "#"+self.hash_tag:
+                text.pop(0)
+            elif text[-1] == "#"+self.hash_tag:
+                text.pop(len(text)-1)
 
         text = " ".join(text)
-        if len(text) > 20:  # 20文字より多かったら<br>入れる(改行)
+        if len(text) > 20:  # 20文字より多かったら改行を入れる
             text = list(text)
             text.insert(20, "<br>")
             text = "".join(text)
