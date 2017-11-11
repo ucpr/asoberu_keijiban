@@ -1,10 +1,7 @@
 import json
 import os
-import random
 import requests
 from requests_oauthlib import OAuth1
-
-a = ["楽しかった!", "最高!", "すごい!", "うぇいｗ", "がはははははｗ"]
 
 
 class Twitter:
@@ -40,7 +37,7 @@ class Twitter:
                 text = text[:35] + "..."
             print(text)
 
-            res["comment"][i]["text"] = random.choice(a) if not text else text
+            res["comment"][i]["text"] = "すごいですね" if not text else text
             res["comment"][i]["date"] = date
             res["comment"][i]["pic"] = pic
 
