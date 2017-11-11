@@ -1,11 +1,15 @@
 import json
 from flask import Flask, jsonify
+import twitter
 
 app = Flask(__name__)
 
 
-@app.route("/", methods=["GET"])
-def hoge():
+@app.route("/comment/<hash_tag>", methods=["GET"])
+def return_comment(hash_tag):
+    tw = twitter.Twitter()
+    tw.get_comment(hash_tag)
+
     with open("comment.json", "r") as f:
         f = json.load(f)
     return jsonify(f)
