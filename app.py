@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 @app.route("/comment/<hash_tag>", methods=["GET"])
 def return_comment(hash_tag):
+    """ GET reqがきたらjsonを返してあげたい気持ちでいっぱい """
     tw = twitter.Twitter()
     tw.get_comment(hash_tag)
 
