@@ -7,8 +7,9 @@ from requests_oauthlib import OAuth1
 class Twitter:
     URL = "https://api.twitter.com/1.1/search/tweets.json"
 
-    def __init__(self):
+    def __init__(self, hashtag):
         self.auth = self._create_auth()
+        self.hash_tag = hashtag
 
     def _create_auth(self):
         """ authを返すお """
@@ -21,10 +22,11 @@ class Twitter:
     def _create_json(self, data, length):
         res = {"comment": [{} for i in range(length)]}
 #        print(data["statuses"])
+        idx = 0
         for i in range(length):
-            pic = data["statuses"][i]["entities"]  # ここからpicのurlを
-            date = data["statuses"][i]["created_at"]  # 日付
-            text = data["statuses"][i]["text"]  # tweetの本文
+            pic = data["statuses"][idx]["entities"]  # ここからpicのurlを
+            date = data["statuses"][idx]["created_at"]  # 日付
+            text = data["statuses"][idx]["text"]  # tweetの本文
             if "media" not in pic.keys():
                 pic = ""
                 text = self._text_format(text, False)
@@ -32,25 +34,43 @@ class Twitter:
                 pic = pic["media"][0]["media_url_https"]
                 text = self._text_format(text)
 
-            res["comment"][i]["text"] = text
-            res["comment"][i]["date"] = date
-            res["comment"][i]["pic"] = pic
+            res["comment"][idx]["text"] = text
+            res["comment"][idx]["date"] = date
+            res["comment"][idx]["pic"] = pic
+            idx += 1
+
+#            if self._over_40(text):
+#                idx -= 1
+#                res["comment"].pop(idx)
+
+#            print(res)
         return res
 
     def _text_format(self, text, pic=True):
         if pic:
-            text = text.split()[1:-1]  # ハッシュタグと画像のlinkを消す
+            text = text.split()[:-1]  # 画像のlinkを消す
+            text.remove("#"+self.hash_tag)
         else:
-            text = text.split()[1:]  # ハッシュタグの部分を消す
+            text = text.split()
+            text.remove("#"+self.hash_tag)
+
         text = " ".join(text)
         if len(text) > 20:  # 20文字より多かったら<br>入れる(改行)
             text = list(text)
             text.insert(20, "<br>")
             text = "".join(text)
+
+        print(text)
         return text
 
-    def get_comment(self, hash_tag):
-        params = {"q": "#"+hash_tag, "count": "15"}
+    def _over_40(self, text):
+        """ commentが40文字を超えていたらだめ """
+        if len(text) >= 45:  # <br>を含むため45に
+            return False
+        return True
+
+    def get_comment(self):
+        params = {"q": "#"+self.hash_tag, "count": "15"}
         req = requests.get(self.URL, auth=self.auth, params=params)
         for i in req.iter_lines():
             data = json.loads(i)
