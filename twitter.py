@@ -22,11 +22,10 @@ class Twitter:
     def _create_json(self, data, length):
         res = {"comment": [{} for i in range(length)]}
 #        print(data["statuses"])
-        idx = 0
         for i in range(length):
-            pic = data["statuses"][idx]["entities"]  # ここからpicのurlを
-            date = data["statuses"][idx]["created_at"]  # 日付
-            text = data["statuses"][idx]["text"]  # tweetの本文
+            pic = data["statuses"][i]["entities"]  # ここからpicのurlを
+            date = data["statuses"][i]["created_at"]  # 日付
+            text = data["statuses"][i]["text"]  # tweetの本文
             if "media" not in pic.keys():
                 pic = ""
                 text = self._text_format(text, False)
@@ -34,16 +33,14 @@ class Twitter:
                 pic = pic["media"][0]["media_url_https"]
                 text = self._text_format(text)
 
-            res["comment"][idx]["text"] = text
-            res["comment"][idx]["date"] = date
-            res["comment"][idx]["pic"] = pic
-            idx += 1
+            if not self._over_40(text):  # 40文字以上だったら35文字目まで + "..."
+                text = text[:35] + "..."
+            print(text)
 
-#            if self._over_40(text):
-#                idx -= 1
-#                res["comment"].pop(idx)
+            res["comment"][i]["text"] = text
+            res["comment"][i]["date"] = date
+            res["comment"][i]["pic"] = pic
 
-#            print(res)
         return res
 
     def _text_format(self, text, pic=True):
@@ -66,7 +63,6 @@ class Twitter:
             text.insert(20, "<br>")
             text = "".join(text)
 
-        print(text)
         return text
 
     def _over_40(self, text):
