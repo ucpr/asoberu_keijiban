@@ -18,32 +18,45 @@ class Twitter:
         )
         return auth
 
+    def _create_json(self, data, length):
+        res = {"comment": [{} for i in range(length)]}
+#        print(data["statuses"])
+        for i in range(length):
+            pic = data["statuses"][i]["entities"]  # ここからpicのurlを
+            date = data["statuses"][i]["created_at"]  # 日付
+            text = data["statuses"][i]["text"]  # tweetの本文
+            if "media" not in pic.keys():
+                pic = ""
+                text = self._text_format(text, False)
+            else:
+                pic = pic["media"][0]["media_url_https"]
+                text = self._text_format(text)
+
+            res["comment"][i]["text"] = text
+            res["comment"][i]["date"] = date
+            res["comment"][i]["pic"] = pic
+        return res
+
+    def _text_format(self, text, pic=True):
+        if pic:
+            text = text.split()[1:-1]  # ハッシュタグと画像のlinkを消す
+        else:
+            text = text.split()[1:]  # ハッシュタグの部分を消す
+        text = " ".join(text)
+        if len(text) > 20:  # 20文字より多かったら<br>入れる(改行)
+            text = list(text)
+            text.insert(20, "<br>")
+            text = "".join(text)
+        return text
+
     def get_comment(self, hash_tag):
         params = {"q": "#"+hash_tag, "count": "15"}
         req = requests.get(self.URL, auth=self.auth, params=params)
         for i in req.iter_lines():
             data = json.loads(i)
-            json_data = self.create_json(data, len(data["statuses"]))
+            json_data = self._create_json(data, len(data["statuses"]))
             with open("comment.json", "w") as f:
-                json.dump(json_data, f)
-
-    def create_json(self, data, length):
-        res = {"comment": [{} for i in range(length)]}
-        print(data["statuses"])
-        for i in range(length):
-            pic = data["statuses"][i]["entities"]  # ここからpicのurlを
-            date = data["statuses"][i]["created_at"]  # 日付
-            text = data["statuses"][i]["text"].split()[1]  # tweetの本文
-            if "media" not in pic.keys():
-                pic = ""
-            else:
-                pic = pic["media"][0]["media_url_https"]
-
-            print(pic, text)
-            res["comment"][i]["text"] = text
-            res["comment"][i]["date"] = date
-            res["comment"][i]["pic"] = pic
-        return res
+                json.dump(json_data, f)  # jsonに書き込み
 
 
 if __name__ == "__main__":
