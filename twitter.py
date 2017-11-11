@@ -1,4 +1,5 @@
 import json
+import os
 import requests
 from requests_oauthlib import OAuth1
 
@@ -11,16 +12,14 @@ class Twitter:
 
     def _create_auth(self):
         """ authを返すお """
-        with open("secret.json", "r") as f:
-            f = json.load(f)
-            auth = OAuth1(
-                f["consumer_key"], f["consumer_secret"],
-                f["access_token"], f["access_token_secret"]
-            )
+        auth = OAuth1(
+            os.getenv["CONSUMER_KEY"], os.getenv["CONSUMER_SECRET"],
+            os.getenv["TOKEN"], os.getenv["TOKEN_SECRET"],
+        )
         return auth
 
     def get_comment(self, hash_tag):
-        req = requests.get(self.URL, auth=self.auth, params={"q": hash_tag, "count": "100"})
+        req = requests.get(self.URL, auth=self.auth, params={"q": "#"+hash_tag, "count": "100"})
         for i in req.iter_lines():
             data = json.loads(i)
             json_data = self.create_json(data, len(data["statuses"]))
