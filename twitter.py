@@ -13,8 +13,8 @@ class Twitter:
     def _create_auth(self):
         """ authを返すお """
         auth = OAuth1(
-            os.getenv["CONSUMER_KEY"], os.getenv["CONSUMER_SECRET"],
-            os.getenv["TOKEN"], os.getenv["TOKEN_SECRET"],
+            os.environ["CONSUMER_KEY"], os.environ["CONSUMER_SECRET"],
+            os.environ["TOKEN"], os.environ["TOKEN_SECRET"]
         )
         return auth
 
