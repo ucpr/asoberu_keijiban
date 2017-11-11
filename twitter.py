@@ -19,7 +19,7 @@ class Twitter:
         return auth
 
     def get_comment(self, hash_tag):
-        params = {"q": "#"+hash_tag, "count": "100"}
+        params = {"q": "#"+hash_tag, "count": "15"}
         req = requests.get(self.URL, auth=self.auth, params=params)
         for i in req.iter_lines():
             data = json.loads(i)
@@ -29,12 +29,17 @@ class Twitter:
 
     def create_json(self, data, length):
         res = {"comment": [{} for i in range(length)]}
+        print(data["statuses"])
         for i in range(length):
             pic = data["statuses"][i]["entities"]  # ここからpicのurlを
             date = data["statuses"][i]["created_at"]  # 日付
             text = data["statuses"][i]["text"].split()[1]  # tweetの本文
-            print(pic, text)
+            if "media" not in pic.keys():
+                pic = ""
+            else:
+                pic = pic["media"][0]["media_url_https"]
 
+            print(pic, text)
             res["comment"][i]["text"] = text
             res["comment"][i]["date"] = date
             res["comment"][i]["pic"] = pic
