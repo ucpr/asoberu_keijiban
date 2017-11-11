@@ -1,2 +1,7 @@
 # secret
 secret.json
+.env
+__pycache__
+comment.json
+Pipfile.lock
+Pipfile
