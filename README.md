@@ -33,5 +33,5 @@ jsonの形式は以下の例の通りです.
 
 ```bash
 $ curl https://enigmatic-earth-37733.herokuapp.com/comment/hogepoyo  
-$ https://enigmatic-earth-37733.herokuapp.com/comment/banana
+$ curl https://enigmatic-earth-37733.herokuapp.com/comment/banana
 ```
